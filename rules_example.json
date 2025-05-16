@@ -1,0 +1,56 @@
+{
+	"rules": {
+		".read": "root.child('usuarios').child(auth.uid).child('funcao').val() === 'ADMIN'",
+		".write": "root.child('usuarios').child(auth.uid).child('funcao').val() === 'ADMIN'",
+		"usuarios": {
+			"$uid": {
+				".validate": "newData.hasChildren(['uid', 'nome','email', 'funcao'])",
+				".read": "$uid === auth.uid || root.child('usuarios').child(auth.uid).child('funcao').val() === 'ADMIN'",
+				".write": "$uid === auth.uid || root.child('usuarios').child(auth.uid).child('funcao').val() === 'ADMIN'",
+				"funcao": {
+					".validate": "newData.val() == 'ADMIN' || newData.val() == 'ALUNO'"
+				},
+				"modulo": {
+					"$nome": {
+						".validate": "newData.hasChildren(['nome', 'porcentagem'])",
+						"descricao": {
+							".validate": "newData.isNumber()"
+						}
+					}
+				}
+			}
+		},
+		"modulos": {
+			"$nome": {
+				".validate": "newData.hasChildren(['nome', 'questoes'])",
+				".read": "root.child('usuarios').child(auth.uid).child('funcao').val() === 'ADMIN'",
+				".write": "root.child('usuarios').child(auth.uid).child('funcao').val() === 'ADMIN'",
+				"questoes": {
+					"$id": {
+						".validate": "newData.hasChildren(['pergunta', 'exemplo', 'resposta'])",
+						".read": "root.child('usuarios').child(auth.uid).child('funcao').val() === 'ADMIN' || root.child('usuarios').child(auth.uid).child('funcao').val() === 'ALUNO'",
+						".write": "root.child('usuarios').child(auth.uid).child('funcao').val() === 'ADMIN' || root.child('usuarios').child(auth.uid).child('funcao').val() === 'ALUNO'",
+						"pergunta": {
+							".validate": "newData.isString()"
+						},
+						"exemplo": {
+							".validate": "newData.isString()"
+						},
+						"resposta": {
+							".validate": "newData.hasChildren(['id', 'resposta', 'isCorrect'])",
+							"id": {
+								".validate": "newData.isNumber()"
+							},
+							"resposta": {
+								".validate": "newData.isString()"
+							},
+							"isCorrect": {
+								".validate": "newData.isBoolean()"
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
