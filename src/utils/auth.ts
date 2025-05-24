@@ -1,34 +1,27 @@
 import { auth, rtdb } from '@/config/firebase'
 import {
 	signInWithEmailAndPassword,
-	GoogleAuthProvider,
 	createUserWithEmailAndPassword,
-	signInWithPopup,
-	signOut
+	signOut,
+	updateProfile,
+	sendEmailVerification
 } from 'firebase/auth'
 import { ref, set } from 'firebase/database'
 
-const provider = new GoogleAuthProvider()
-
-export const SignInWithEmail = async (email: string, password: string) => {
+export const SignInWithEmail = async (
+	email: string,
+	password: string
+): Promise<void> => {
 	try {
-		const userCredential = await signInWithEmailAndPassword(
+		const userCredentials = await signInWithEmailAndPassword(
 			auth,
 			email,
 			password
 		)
-		return userCredential.user
+		if (!userCredentials.user) throw new Error('User not found')
 	} catch (error) {
-		console.error('Error signing in with email and password:', error)
-	}
-}
-
-export const SignInWithGoogle = async () => {
-	try {
-		const result = await signInWithPopup(auth, provider)
-		return result.user
-	} catch (error) {
-		console.error('Error signing in with Google:', error)
+		console.error('Error signing in:', error)
+		throw new Error('Invalid email or password')
 	}
 }
 
@@ -37,50 +30,33 @@ export const SignUpWithEmail = async (
 	email: string,
 	password: string,
 	role: string
-) => {
+): Promise<void> => {
 	try {
-		const userCredential = await createUserWithEmailAndPassword(
+		const userCredentials = await createUserWithEmailAndPassword(
 			auth,
 			email,
 			password
 		)
-		if (userCredential.user) {
-			const userRef = ref(rtdb, `users/${userCredential.user.uid}`)
-			try {
-				await set(userRef, {
-					uid: userCredential.user.uid,
-					name: name,
-					email: email,
-					password: password,
-					role: role,
-					createdAt: new Date().toISOString().split('T')[0]
-				})
 
-				return userCredential.user
-			} catch (error) {
-				console.error(
-					'Error saving user data to Realtime Database:',
-					error
-				)
-			}
-		} else {
-			throw new Error('User could not be created')
-		}
+		await sendEmailVerification(userCredentials.user)
+		await updateProfile(userCredentials.user, { displayName: name })
+
+		const userRef = ref(rtdb, `users/${userCredentials.user.uid}`)
+		await set(userRef, {
+			uid: userCredentials.user.uid,
+			name,
+			email,
+			password,
+			role,
+			createdAt: new Date().toISOString().split('T')[0]
+		})
 	} catch (error) {
-		console.error('Error signing up with email and password:', error)
+		console.error('Error creating user:', error)
+		throw new Error('User could not be created')
 	}
 }
 
-export const SignUpWithGoogle = async () => {
-	try {
-		const result = await signInWithPopup(auth, provider)
-		return result.user
-	} catch (error) {
-		console.error('Error signing up with Google:', error)
-	}
-}
-
-export const Logout = async () => {
+export const Logout = async (): Promise<void> => {
 	try {
 		await signOut(auth)
 	} catch (error) {

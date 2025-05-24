@@ -8,10 +8,17 @@ import Companies from './pages/auth/companies'
 import NewCompany from './pages/company/crud/create'
 import Contact from './pages/contact'
 import About from './pages/about'
+import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute'
+import ErrorPage from './pages/error'
 
 const AppRoutes = () => {
 	return (
 		<Routes>
+			<Route
+				path='/error'
+				element={<ErrorPage />}
+			/>
+
 			<Route
 				index
 				path='/'
@@ -29,11 +36,6 @@ const AppRoutes = () => {
 			/>
 
 			<Route
-				path='/dashboard'
-				element={<Dashboard />}
-			/>
-
-			<Route
 				path='/signin'
 				element={<Auth />}
 			/>
@@ -44,23 +46,48 @@ const AppRoutes = () => {
 			/>
 
 			<Route
+				path='/dashboard'
+				element={
+					<ProtectedRoute>
+						<Dashboard />
+					</ProtectedRoute>
+				}
+			/>
+
+			<Route
 				path='/companies'
-				element={<Companies />}
+				element={
+					<ProtectedRoute>
+						<Companies />
+					</ProtectedRoute>
+				}
 			/>
 
 			<Route
 				path='/user/:id'
-				element={<Profile />}
+				element={
+					<ProtectedRoute>
+						<Profile />
+					</ProtectedRoute>
+				}
 			/>
 
 			<Route
 				path='/companies/:id'
-				element={<Company />}
+				element={
+					<ProtectedRoute>
+						<Company />
+					</ProtectedRoute>
+				}
 			/>
 
 			<Route
 				path='/company/new'
-				element={<NewCompany />}
+				element={
+					<ProtectedRoute>
+						<NewCompany />
+					</ProtectedRoute>
+				}
 			/>
 		</Routes>
 	)

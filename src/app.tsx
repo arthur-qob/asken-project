@@ -2,7 +2,7 @@ import { useLocation } from 'react-router-dom'
 import AppRoutes from './routes.tsx'
 import styles from './app.module.scss'
 import NavBar from './components/NavBar/NavBar.tsx'
-import { CompanyProvider } from './contexts/Company.tsx'
+import { CompanyProvider } from './contexts/CompanyContext.tsx'
 
 const App = () => {
 	const currentRoute = useLocation().pathname

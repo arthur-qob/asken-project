@@ -1,4 +1,4 @@
-import { SignUpWithEmail, SignUpWithGoogle } from '@/utils/auth'
+import { SignUpWithEmail } from '@/utils/auth'
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
@@ -16,6 +16,12 @@ const SignUp = ({ styles, route }: SignUpProps) => {
 		role: 'user'
 	})
 
+	const roles = ['Logistics Operator', 'Warehouse Operator', 'Sales Manager']
+
+	const handleRoleSelection = (e: React.ChangeEvent<HTMLSelectElement>) => {
+		setUserData({ ...userData, role: e.target.value })
+	}
+
 	const [formIsFilled, setFormIsFilled] = useState(false)
 
 	useEffect(() => {
@@ -26,12 +32,6 @@ const SignUp = ({ styles, route }: SignUpProps) => {
 		}
 	}, [userData])
 
-	const roles = ['Logistics Operator', 'Warehouse Operator', 'Sales Manager']
-
-	const handleRoleSelection = (e: React.ChangeEvent<HTMLSelectElement>) => {
-		setUserData({ ...userData, role: e.target.value })
-	}
-
 	const [loading, setLoading] = useState(false)
 
 	const navigate = useNavigate()
@@ -41,12 +41,6 @@ const SignUp = ({ styles, route }: SignUpProps) => {
 
 		if (!formIsFilled) {
 			alert('Please fill in all fields')
-			setLoading(false)
-			return
-		}
-
-		if (userData.password !== userData.confirmPassword) {
-			alert('Passwords do not match')
 			setLoading(false)
 			return
 		}
@@ -88,17 +82,6 @@ const SignUp = ({ styles, route }: SignUpProps) => {
 			alert('Sign-up failed: ' + (error as Error).message)
 		}
 		setLoading(false)
-	}
-
-	const handleGoogleSignUp = async () => {
-		try {
-			await SignUpWithGoogle()
-			alert('Google sign-in successful')
-
-			navigate('/dashboard')
-		} catch (error) {
-			alert('Google sign-in failed: ' + (error as Error).message)
-		}
 	}
 
 	const [showPassword, setShowPassword] = useState(false)
@@ -207,13 +190,6 @@ const SignUp = ({ styles, route }: SignUpProps) => {
 				disabled={loading || !formIsFilled}
 				onClick={handleSignUp}>
 				Sign Up
-			</button>
-
-			<button
-				className={styles?.googleBtn}
-				onClick={handleGoogleSignUp}>
-				<i className='fa-brands fa-google'></i>
-				<span>Continue with Google</span>
 			</button>
 
 			<span className={styles?.separator}>

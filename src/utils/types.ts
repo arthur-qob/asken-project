@@ -1,13 +1,25 @@
-export type Company = {
-	id?: string
+export type Participant = {
+	id: string
 	name: string
-	createdAt: Date
+	email: string
+	phone: string
+}
+
+export type Items = {
+	[key: string]: {
+		ref: string
+		descripton: string
+		qtyPurchased: number
+		qtyAvailable: number
+		qtyToBeReceived: number
+		invNo: string
+	}
 }
 
 export type Item = {
-	id?: string
+	id: string
 	name: string
 	quantity: number
-	companyId: string
-	createdAt: Date
+	price: number
+	description: string
 }

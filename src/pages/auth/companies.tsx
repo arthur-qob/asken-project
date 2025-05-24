@@ -3,7 +3,7 @@ import { Company } from '@/utils/types'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import styles from './styles.module.scss'
-import { useCompany } from '@/contexts/Company'
+import { useCompany } from '@/contexts/CompanyContext'
 
 const Companies = () => {
 	const [companies, setCompanies] = useState<Company[] | null>(null)

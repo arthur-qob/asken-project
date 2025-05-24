@@ -1,6 +1,7 @@
-import { SignInWithEmail, SignInWithGoogle } from '@/utils/auth'
+import { SignInWithEmail } from '@/utils/auth'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { ClipLoader } from 'react-spinners'
 
 interface SignInProps {
 	styles?: CSSModuleClasses
@@ -43,26 +44,15 @@ const SignIn = ({ styles, route }: SignInProps) => {
 			return
 		}
 
-		try {
-			await SignInWithEmail(userData.email, userData.password)
-			alert('Sign-in successful')
+		await SignInWithEmail(userData.email, userData.password).then((res) => {
+			console.log('res', res)
 
-			navigate('/companies')
-		} catch (error) {
-			alert('Sign-in failed: ' + (error as Error).message)
-		}
+			if (res !== undefined) {
+				navigate('/dashboard')
+			}
+		})
+
 		setLoading(false)
-	}
-
-	const handleGoogleSignIn = async () => {
-		try {
-			await SignInWithGoogle()
-			alert('Google sign-in successful')
-
-			navigate('/companies')
-		} catch (error) {
-			alert('Google sign-in failed: ' + (error as Error).message)
-		}
 	}
 
 	const [showPassword, setShowPassword] = useState(false)
@@ -114,14 +104,16 @@ const SignIn = ({ styles, route }: SignInProps) => {
 				className={styles?.submit}
 				disabled={loading}
 				onClick={handleSignIn}>
-				Sign In
-			</button>
-
-			<button
-				className={styles?.googleBtn}
-				onClick={handleGoogleSignIn}>
-				<i className='fa-brands fa-google'></i>
-				<span>Continue with Google</span>
+				{loading ? (
+					<ClipLoader
+						color='#ffffff'
+						size={20}
+						loading={loading}
+						aria-label='Loading Spinner'
+					/>
+				) : (
+					'Sign In'
+				)}
 			</button>
 
 			<span className={styles?.separator}>
