@@ -1,4 +1,4 @@
-import { auth, rtdb } from '@/config/firebase'
+import { auth, rtdb } from '@/utils/config/firebase'
 import {
 	signInWithEmailAndPassword,
 	createUserWithEmailAndPassword,

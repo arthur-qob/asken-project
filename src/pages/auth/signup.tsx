@@ -1,11 +1,15 @@
+import { useState, useEffect } from 'react'
+import { useNavigate, Link } from 'react-router-dom'
 import { SignUpWithEmail } from '@/utils/auth'
-import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
 
 interface SignUpProps {
 	styles?: CSSModuleClasses
 	route: string
 }
+
+const roles = ['Logistics Operator', 'Warehouse Operator', 'Sales Manager']
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@#$%^&+=]{8,}$/
 
 const SignUp = ({ styles, route }: SignUpProps) => {
 	const [userData, setUserData] = useState({
@@ -16,41 +20,31 @@ const SignUp = ({ styles, route }: SignUpProps) => {
 		role: 'user'
 	})
 
-	const roles = ['Logistics Operator', 'Warehouse Operator', 'Sales Manager']
-
-	const handleRoleSelection = (e: React.ChangeEvent<HTMLSelectElement>) => {
-		setUserData({ ...userData, role: e.target.value })
-	}
-
 	const [formIsFilled, setFormIsFilled] = useState(false)
-
-	useEffect(() => {
-		if (Object.values(userData).some((field) => field === '')) {
-			setFormIsFilled(false)
-		} else if (Object.values(userData).every((field) => field !== '')) {
-			setFormIsFilled(true)
-		}
-	}, [userData])
-
 	const [loading, setLoading] = useState(false)
-
+	const [showPassword, setShowPassword] = useState(false)
+	const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 	const navigate = useNavigate()
 
-	const handleSignUp = async () => {
-		setLoading(true)
+	useEffect(() => {
+		const filled = Object.values(userData).every((field) => field !== '')
+		setFormIsFilled(filled)
+	}, [userData])
 
+	const handleInputChange =
+		(field: keyof typeof userData) =>
+		(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+			setUserData((prev) => ({ ...prev, [field]: e.target.value }))
+		}
+
+	const handleSignUp = async () => {
 		if (!formIsFilled) {
 			alert('Please fill in all fields')
-			setLoading(false)
 			return
 		}
 
-		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-		const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@#$%^&+=]{8,}$/
-
 		if (!emailRegex.test(userData.email)) {
 			alert('Invalid email format')
-			setLoading(false)
 			return
 		}
 
@@ -58,16 +52,15 @@ const SignUp = ({ styles, route }: SignUpProps) => {
 			alert(
 				'Password must be at least 8 characters and contain one letter and one number'
 			)
-			setLoading(false)
 			return
 		}
 
 		if (userData.password !== userData.confirmPassword) {
 			alert('Passwords do not match')
-			setLoading(false)
 			return
 		}
 
+		setLoading(true)
 		try {
 			await SignUpWithEmail(
 				userData.name,
@@ -76,22 +69,11 @@ const SignUp = ({ styles, route }: SignUpProps) => {
 				userData.role
 			)
 			alert('Sign-up successful')
-
 			navigate('/signin')
 		} catch (error) {
 			alert('Sign-up failed: ' + (error as Error).message)
 		}
 		setLoading(false)
-	}
-
-	const [showPassword, setShowPassword] = useState(false)
-	const togglePasswordVisibility = () => {
-		setShowPassword(!showPassword)
-	}
-
-	const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-	const toggleConfirmPasswordVisibility = () => {
-		setShowConfirmPassword(!showConfirmPassword)
 	}
 
 	return (
@@ -106,12 +88,7 @@ const SignUp = ({ styles, route }: SignUpProps) => {
 				type='text'
 				placeholder='Name'
 				value={userData.name}
-				onChange={(name) =>
-					setUserData({
-						...userData,
-						name: name.target.value
-					})
-				}
+				onChange={handleInputChange('name')}
 			/>
 
 			<input
@@ -119,34 +96,23 @@ const SignUp = ({ styles, route }: SignUpProps) => {
 				type='email'
 				placeholder='Email'
 				value={userData.email}
-				onChange={(email) =>
-					setUserData({
-						...userData,
-						email: email.target.value
-					})
-				}
+				onChange={handleInputChange('email')}
 			/>
 
 			<div className={styles?.password}>
 				<input
 					className={styles?.passwordInput}
-					name='password'
 					type={showPassword ? 'text' : 'password'}
 					placeholder='Password'
 					value={userData.password}
-					onChange={(password) =>
-						setUserData({
-							...userData,
-							password: password.target.value
-						})
-					}
+					onChange={handleInputChange('password')}
 				/>
-
-				<button onClick={togglePasswordVisibility}>
+				<button onClick={() => setShowPassword((prev) => !prev)}>
 					<i
 						className={`fa-solid fa-${
 							showPassword ? 'eye' : 'eye-slash'
-						}`}></i>
+						}`}
+					/>
 				</button>
 			</div>
 
@@ -156,25 +122,20 @@ const SignUp = ({ styles, route }: SignUpProps) => {
 					type={showConfirmPassword ? 'text' : 'password'}
 					placeholder='Confirm password'
 					value={userData.confirmPassword}
-					onChange={(confirmPassword) =>
-						setUserData({
-							...userData,
-							confirmPassword: confirmPassword.target.value
-						})
-					}
+					onChange={handleInputChange('confirmPassword')}
 				/>
-
-				<button onClick={toggleConfirmPasswordVisibility}>
+				<button onClick={() => setShowConfirmPassword((prev) => !prev)}>
 					<i
 						className={`fa-solid fa-${
 							showConfirmPassword ? 'eye' : 'eye-slash'
-						}`}></i>
+						}`}
+					/>
 				</button>
 			</div>
 
 			<select
-				onChange={handleRoleSelection}
-				value={userData.role}>
+				value={userData.role}
+				onChange={handleInputChange('role')}>
 				<option value=''>Select an option</option>
 				{roles.map((role, index) => (
 					<option

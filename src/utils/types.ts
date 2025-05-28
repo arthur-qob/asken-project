@@ -5,17 +5,6 @@ export type Participant = {
 	phone: string
 }
 
-export type Items = {
-	[key: string]: {
-		ref: string
-		descripton: string
-		qtyPurchased: number
-		qtyAvailable: number
-		qtyToBeReceived: number
-		invNo: string
-	}
-}
-
 export type Item = {
 	id: string
 	name: string
@@ -23,3 +12,5 @@ export type Item = {
 	price: number
 	description: string
 }
+
+export type Items = Record<string, Item>

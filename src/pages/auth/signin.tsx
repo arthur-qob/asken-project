@@ -1,7 +1,7 @@
-import { SignInWithEmail } from '@/utils/auth'
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { ClipLoader } from 'react-spinners'
+import { SignInWithEmail } from '@/utils/auth'
 
 interface SignInProps {
 	styles?: CSSModuleClasses
@@ -9,30 +9,28 @@ interface SignInProps {
 }
 
 const SignIn = ({ styles, route }: SignInProps) => {
-	const [userData, setUserData] = useState({
-		email: '',
-		password: ''
-	})
-
+	const [userData, setUserData] = useState({ email: '', password: '' })
 	const [loading, setLoading] = useState(false)
-
+	const [showPassword, setShowPassword] = useState(false)
 	const navigate = useNavigate()
 
-	const handleSignIn = async () => {
-		setLoading(true)
+	const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+	const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@#$%^&+=]{8,}$/
 
+	const handleInputChange =
+		(field: 'email' | 'password') =>
+		(e: React.ChangeEvent<HTMLInputElement>) => {
+			setUserData((prev) => ({ ...prev, [field]: e.target.value }))
+		}
+
+	const handleSignIn = async () => {
 		if (!userData.email || !userData.password) {
 			alert('Please fill in all fields')
-			setLoading(false)
 			return
 		}
 
-		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-		const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@#$%^&+=]{8,}$/
-
 		if (!emailRegex.test(userData.email)) {
 			alert('Invalid email format')
-			setLoading(false)
 			return
 		}
 
@@ -40,22 +38,17 @@ const SignIn = ({ styles, route }: SignInProps) => {
 			alert(
 				'Password must be at least 8 characters and contain one letter and one number'
 			)
-			setLoading(false)
 			return
 		}
 
-		await SignInWithEmail(userData.email, userData.password).then((res) => {
-			console.log('res', res)
-
-			if (res !== undefined) {
-				navigate('/dashboard')
-			}
-		})
-
-		setLoading(false)
+		setLoading(true)
+		try {
+			const res = await SignInWithEmail(userData.email, userData.password)
+			if (res !== undefined) navigate('/dashboard')
+		} finally {
+			setLoading(false)
+		}
 	}
-
-	const [showPassword, setShowPassword] = useState(false)
 
 	return (
 		<section
@@ -69,12 +62,7 @@ const SignIn = ({ styles, route }: SignInProps) => {
 				type='email'
 				placeholder='Email'
 				value={userData.email}
-				onChange={(email) =>
-					setUserData({
-						...userData,
-						email: email.target.value
-					})
-				}
+				onChange={handleInputChange('email')}
 			/>
 
 			<div className={styles?.password}>
@@ -83,14 +71,9 @@ const SignIn = ({ styles, route }: SignInProps) => {
 					type={showPassword ? 'text' : 'password'}
 					placeholder='Password'
 					value={userData.password}
-					onChange={(password) =>
-						setUserData({
-							...userData,
-							password: password.target.value
-						})
-					}
+					onChange={handleInputChange('password')}
 				/>
-				<button onClick={() => setShowPassword(!showPassword)}>
+				<button onClick={() => setShowPassword((prev) => !prev)}>
 					<i
 						className={`fa-solid fa-${
 							showPassword ? 'eye' : 'eye-slash'
@@ -108,8 +91,7 @@ const SignIn = ({ styles, route }: SignInProps) => {
 					<ClipLoader
 						color='#ffffff'
 						size={20}
-						loading={loading}
-						aria-label='Loading Spinner'
+						loading
 					/>
 				) : (
 					'Sign In'
@@ -125,7 +107,7 @@ const SignIn = ({ styles, route }: SignInProps) => {
 			<Link
 				className={styles?.link}
 				to='/signup'>
-				Don't have an acocunt? Create one now!
+				Don’t have an account? Create one now!
 			</Link>
 		</section>
 	)

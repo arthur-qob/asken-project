@@ -1,4 +1,4 @@
-import { Participant, Item, Items } from './types'
+import { Participant, Item, Items } from '../types'
 
 export class Company {
 	public readonly id: string
@@ -10,12 +10,11 @@ export class Company {
 		id: string,
 		name: string,
 		participants: string[],
-		items: Object
+		items: Items
 	) {
 		this.id = id
 		this.name = name
 		this.participants = participants
-		// @ts-ignore
 		this.items = items
 	}
 
