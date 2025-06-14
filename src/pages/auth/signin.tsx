@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { ClipLoader } from 'react-spinners'
 import { SignInWithEmail } from '@/utils/auth'
+import CustomButton from '@/components/CustomButton/customButton'
 
 interface SignInProps {
 	styles?: CSSModuleClasses
@@ -24,7 +25,7 @@ const SignIn = ({ styles, route }: SignInProps) => {
 		}
 
 	const handleSignIn = async () => {
-		if (!userData.email || !userData.password) {
+		if (Object.values(userData).some((value) => value.trim() === '')) {
 			alert('Please fill in all fields')
 			return
 		}
@@ -36,19 +37,31 @@ const SignIn = ({ styles, route }: SignInProps) => {
 
 		if (!passwordRegex.test(userData.password)) {
 			alert(
-				'Password must be at least 8 characters and contain one letter and one number'
+				'Password must be at least 8 characters, and can contain letters, digits and symbols'
 			)
 			return
 		}
 
 		setLoading(true)
-		try {
-			const res = await SignInWithEmail(userData.email, userData.password)
-			if (res !== undefined) navigate('/dashboard')
-		} finally {
-			setLoading(false)
-		}
+
+		await SignInWithEmail(userData.email, userData.password).then((res) => {
+			if (Object.keys(res)[0] === 'success') {
+				if (Object.values(res)[0].usrEmailVerified === false) {
+					// Create custom component to display error messages
+					alert('Please verify your email')
+				}
+
+				navigate('/dashboard')
+			} else {
+				// Create custom component to display error messages
+				alert(Object.values(res)[0].message)
+			}
+		})
+
+		setLoading(false)
 	}
+
+	const Button = CustomButton
 
 	return (
 		<section
@@ -83,8 +96,8 @@ const SignIn = ({ styles, route }: SignInProps) => {
 
 			<p className={styles?.resetPasswordLink}>Forgot password?</p>
 
-			<button
-				className={styles?.submit}
+			<Button
+				variant='primary'
 				disabled={loading}
 				onClick={handleSignIn}>
 				{loading ? (
@@ -96,7 +109,7 @@ const SignIn = ({ styles, route }: SignInProps) => {
 				) : (
 					'Sign In'
 				)}
-			</button>
+			</Button>
 
 			<span className={styles?.separator}>
 				<span></span>
@@ -107,7 +120,7 @@ const SignIn = ({ styles, route }: SignInProps) => {
 			<Link
 				className={styles?.link}
 				to='/signup'>
-				Don’t have an account? Create one now!
+				Don't have an account? Create one now!
 			</Link>
 		</section>
 	)

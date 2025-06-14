@@ -194,7 +194,7 @@
 		background-color: rgb(20, 159, 210);
 		justify-content: center;
 		align-items: center;
-		transition: border-radius 0.1s ease-in-out;
+		transition: border-radius 0.1s ease-in-out, opacity 0.1s ease-in-out;
 
 		&.imgRight {
 			right: 0;
@@ -203,9 +203,9 @@
 		}
 
 		&.imgLeft {
-			left: 0;
+			right: 50%;
 			border-radius: 0 25px 25px 0;
-			transition: left 0.1s ease-in-out;
+			transition: right 0.1s ease-in-out;
 		}
 	}
 }
@@ -249,4 +249,48 @@
 			box-shadow: 0 0 7.5px rgba(0, 0, 0, 0.5);
 		}
 	}
+}
+
+@keyframes growFullScreen {
+	0% {
+		width: 50%;
+		right: 0;
+		border-radius: 25px 0 0 25px;
+	}
+	50% {
+		width: 100%;
+		right: 0;
+		border-radius: 0;
+	}
+	100% {
+		width: 50%;
+		right: 50%;
+		border-radius: 0 25px 25px 0;
+	}
+}
+
+@keyframes growFullScreenReverse {
+	0% {
+		width: 50%;
+		right: 50%;
+		border-radius: 0 25px 25px 0;
+	}
+	50% {
+		width: 100%;
+		right: 0;
+		border-radius: 0;
+	}
+	100% {
+		width: 50%;
+		right: 0;
+		border-radius: 25px 0 0 25px;
+	}
+}
+
+.animateRightToLeft {
+	animation: growFullScreen 0.8s ease-in-out forwards;
+}
+
+.animateLeftToRight {
+	animation: growFullScreenReverse 0.8s ease-in-out forwards;
 }

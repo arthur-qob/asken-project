@@ -1,4 +1,4 @@
-import Modal from '@/components/Modal/Modal'
+import Modal from '@/components/Modal/modal'
 import styles from './styles.module.scss'
 import { useState } from 'react'
 

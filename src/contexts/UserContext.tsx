@@ -1,21 +1,39 @@
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
+import { useLoading } from './loadingContext'
+import { onAuthStateChanged, User } from 'firebase/auth'
+import { auth } from '@/utils/config/firebase'
 
 type UserContextPropsTypes = {
-	uid: string | undefined
+	user: User | null
 	isLoggedIn: boolean
-	setUid: (uid: string | undefined) => void
-	setIsLoggedIn: (isLoggedIn: boolean) => void
 }
 
 const UserContext = createContext<UserContextPropsTypes | undefined>(undefined)
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
+	const [user, setUser] = useState<User | null>(null)
 	const [isLoggedIn, setIsLoggedIn] = useState(false)
-	const [uid, setUid] = useState<string | undefined>(undefined)
+	const { setIsLoading } = useLoading()
+
+	useEffect(() => {
+		setIsLoading(true)
+
+		const sub = onAuthStateChanged(auth, (user) => {
+			if (user) {
+				setUser(user)
+				setIsLoggedIn(true)
+				setIsLoading(false)
+			} else {
+				setUser(null)
+			}
+		})
+
+		setIsLoading(false)
+		return () => sub()
+	}, [])
 
 	return (
-		<UserContext.Provider
-			value={{ uid, setUid, isLoggedIn, setIsLoggedIn }}>
+		<UserContext.Provider value={{ isLoggedIn, user }}>
 			{children}
 		</UserContext.Provider>
 	)

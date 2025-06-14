@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { SignUpWithEmail } from '@/utils/auth'
+import CustomButton from '@/components/CustomButton/customButton'
 
 interface SignUpProps {
 	styles?: CSSModuleClasses
@@ -27,7 +28,9 @@ const SignUp = ({ styles, route }: SignUpProps) => {
 	const navigate = useNavigate()
 
 	useEffect(() => {
-		const filled = Object.values(userData).every((field) => field !== '')
+		const filled = Object.values(userData).every(
+			(field) => field.trim() !== ''
+		)
 		setFormIsFilled(filled)
 	}, [userData])
 
@@ -75,6 +78,8 @@ const SignUp = ({ styles, route }: SignUpProps) => {
 		}
 		setLoading(false)
 	}
+
+	const Button = CustomButton
 
 	return (
 		<section
@@ -146,12 +151,12 @@ const SignUp = ({ styles, route }: SignUpProps) => {
 				))}
 			</select>
 
-			<button
-				className={styles?.submit}
+			<Button
+				variant='primary'
 				disabled={loading || !formIsFilled}
 				onClick={handleSignUp}>
 				Sign Up
-			</button>
+			</Button>
 
 			<span className={styles?.separator}>
 				<span></span>

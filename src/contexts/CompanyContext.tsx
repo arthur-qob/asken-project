@@ -1,7 +1,6 @@
-import { Company } from '@/utils/types'
 import React, { createContext, useState } from 'react'
 
-type selectedCompanyType = Company | string | null
+type selectedCompanyType = string | null
 
 type CompanyContextType = {
 	selectedCompany: selectedCompanyType

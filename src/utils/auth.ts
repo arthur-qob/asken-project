@@ -11,18 +11,43 @@ import { ref, set } from 'firebase/database'
 export const SignInWithEmail = async (
 	email: string,
 	password: string
-): Promise<void> => {
-	try {
+): Promise<Object> => {
+	let result: {
+		[key: string]: {
+			status: boolean
+			message: string
+			usrEmailVerified?: boolean
+		}
+	}
+
+	return new Promise(async (res, rej) => {
 		const userCredentials = await signInWithEmailAndPassword(
 			auth,
 			email,
 			password
 		)
-		if (!userCredentials.user) throw new Error('User not found')
-	} catch (error) {
-		console.error('Error signing in:', error)
-		throw new Error('Invalid email or password')
-	}
+
+		if (userCredentials.user) {
+			result = {
+				success: {
+					status: true,
+					message: 'User found',
+					usrEmailVerified: userCredentials.user.emailVerified
+				}
+			}
+
+			res(result)
+		} else {
+			result = {
+				error: {
+					status: false,
+					message: 'User not found'
+				}
+			}
+
+			rej(result)
+		}
+	})
 }
 
 export const SignUpWithEmail = async (
@@ -30,30 +55,48 @@ export const SignUpWithEmail = async (
 	email: string,
 	password: string,
 	role: string
-): Promise<void> => {
-	try {
+): Promise<Object> => {
+	let result: { [key: string]: { status: boolean; message: string } }
+
+	return new Promise(async (res, rej) => {
 		const userCredentials = await createUserWithEmailAndPassword(
 			auth,
 			email,
 			password
 		)
 
-		await sendEmailVerification(userCredentials.user)
-		await updateProfile(userCredentials.user, { displayName: name })
+		if (userCredentials.user) {
+			await sendEmailVerification(userCredentials.user)
+			await updateProfile(userCredentials.user, { displayName: name })
 
-		const userRef = ref(rtdb, `users/${userCredentials.user.uid}`)
-		await set(userRef, {
-			uid: userCredentials.user.uid,
-			name,
-			email,
-			password,
-			role,
-			createdAt: new Date().toISOString().split('T')[0]
-		})
-	} catch (error) {
-		console.error('Error creating user:', error)
-		throw new Error('User could not be created')
-	}
+			const userRef = ref(rtdb, `users/${userCredentials.user.uid}`)
+			await set(userRef, {
+				uid: userCredentials.user.uid,
+				name,
+				email,
+				role,
+				createdAt: new Date().toISOString().split('T')[0]
+			})
+
+			result = {
+				success: {
+					status: true,
+					message: 'User created successfully'
+				}
+			}
+
+			res(result)
+		} else {
+			result = {
+				error: {
+					status: false,
+					message: 'User could not be created'
+				}
+			}
+
+			rej(result)
+		}
+	})
 }
 
 export const Logout = async (): Promise<void> => {

@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app'
-import { getAuth } from 'firebase/auth'
+import { browserSessionPersistence, getAuth } from 'firebase/auth'
 import { getFirestore } from 'firebase/firestore'
 import { getDatabase } from 'firebase/database'
 
@@ -18,5 +18,7 @@ const app = initializeApp(firebaseConfig)
 const auth = getAuth(app)
 const fsdb = getFirestore(app)
 const rtdb = getDatabase(app)
+
+auth.setPersistence(browserSessionPersistence)
 
 export { app, auth, fsdb, rtdb }

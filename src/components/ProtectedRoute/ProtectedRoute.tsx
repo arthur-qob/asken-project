@@ -1,4 +1,4 @@
-import { useUser } from '@/contexts/UserContext'
+import { useUser } from '@/contexts/userContext'
 import { useNavigate } from 'react-router-dom'
 
 type ProtectedRouteProps = {

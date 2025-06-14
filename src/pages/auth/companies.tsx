@@ -1,5 +1,4 @@
 // import { getCompanies } from '@/utils/company'
-// import { Company } from '@/utils/types'
 // import { useEffect, useState } from 'react'
 // import { useNavigate } from 'react-router-dom'
 // import styles from './styles.module.scss'
@@ -75,3 +74,26 @@
 // }
 
 // export default Companies
+
+const CompaniesTest = () => {
+	const companies = ['Technicare USA', 'Implamed USA', 'Hasten']
+
+	return (
+		<section>
+			<h1>Choose a company</h1>
+			{companies.map((company, index) => (
+				<button
+					key={index}
+					className='companies-btns'
+					onClick={() => {
+						console.log(`Selected company: ${company}`)
+					}}>
+					<h3>{company}</h3>
+					<i className='fa-solid fa-chevron-right'></i>
+				</button>
+			))}
+		</section>
+	)
+}
+
+export { CompaniesTest as Companies }
