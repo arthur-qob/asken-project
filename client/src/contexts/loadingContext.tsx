@@ -1,3 +1,4 @@
+import ModelError from '@/utils/modelError'
 import { createContext, useContext, useState } from 'react'
 
 type LoadingContextTypes = {
@@ -27,7 +28,7 @@ export const useLoading = () => {
 	const context = useContext(LoadingContext)
 
 	if (!context) {
-		throw new Error('useLoading must be used within LoadingProvider')
+		throw new ModelError('useLoading must be used within LoadingProvider')
 	}
 
 	return context

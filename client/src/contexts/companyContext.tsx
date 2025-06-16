@@ -1,3 +1,4 @@
+import ModelError from '@/utils/modelError'
 import React, { createContext, useState } from 'react'
 
 type selectedCompanyType = string | null
@@ -29,7 +30,7 @@ export const useCompany = () => {
 	const context = React.useContext(CompanyContext)
 
 	if (context === undefined)
-		throw new Error('Please wrap your component with the component')
+		throw new ModelError('Please wrap your component with the component')
 
 	return context
 }

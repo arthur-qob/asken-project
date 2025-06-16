@@ -1,32 +1,64 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useNavigate } from 'react-router-dom'
 import Dashboard from './pages/dashboard'
 import Auth from './pages/auth/auth'
 import Company from './pages/company'
 import Profile from './pages/profile'
 import { Companies } from './pages/auth/companies'
 import NewCompany from './pages/company/crud/create'
-import ErrorPage from './pages/error'
 import { useUser } from '@/contexts/userContext'
-import { useNavigate } from 'react-router-dom'
 import { HomePage } from './pages/landing'
 import { AnimatePresence } from 'framer-motion'
 import { PageWrapper } from './components/pageWrapper'
+import { TestPage } from './pages/tests'
+import { useModal } from './contexts/modalContext'
+import { useEffect } from 'react'
 
 type ProtectedRouteProps = {
 	children: React.ReactNode
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-	const { isLoggedIn } = useUser()
+	const { isLoggedIn, idToken, getFreshToken } = useUser()
+	const { setIsOpen, setModalContent, setOnClose } = useModal()
 	const navigate = useNavigate()
 
-	return <>{isLoggedIn ? { children } : navigate('/error')}</>
+	useEffect(() => {
+		const verifyAccess = async () => {
+			const token = idToken || (await getFreshToken())
+
+			if (!isLoggedIn || !token) {
+				setIsOpen(true)
+				setModalContent(
+					'You do not have access to this page. Please sign in and try again.'
+				)
+				setOnClose(() => () => {
+					setIsOpen(false)
+					navigate('/')
+				})
+			}
+		}
+
+		verifyAccess()
+	}, [isLoggedIn, idToken])
+
+	if (!isLoggedIn || !idToken) return null
+
+	return <>{children}</>
 }
 
 const AppRoutes = () => {
 	return (
 		<AnimatePresence mode='wait'>
 			<Routes>
+				<Route
+					path='/test'
+					element={
+						<ProtectedRoute>
+							<TestPage />
+						</ProtectedRoute>
+					}
+				/>
+
 				<Route
 					index
 					path='/'
@@ -36,22 +68,17 @@ const AppRoutes = () => {
 						</PageWrapper>
 					}
 				/>
-				<Route
-					path='/error'
-					element={
-						<PageWrapper>
-							<ErrorPage />
-						</PageWrapper>
-					}
-				/>
+
 				<Route
 					path='/signin'
 					element={<Auth />}
 				/>
+
 				<Route
 					path='/signup'
 					element={<Auth />}
 				/>
+
 				<Route
 					path='/dashboard'
 					element={
@@ -62,6 +89,7 @@ const AppRoutes = () => {
 						</PageWrapper>
 					}
 				/>
+
 				<Route
 					path='/companies'
 					element={
@@ -72,6 +100,7 @@ const AppRoutes = () => {
 						</PageWrapper>
 					}
 				/>
+
 				<Route
 					path='/user/:id'
 					element={
@@ -82,6 +111,7 @@ const AppRoutes = () => {
 						</PageWrapper>
 					}
 				/>
+
 				<Route
 					path='/companies/:id'
 					element={
@@ -92,6 +122,7 @@ const AppRoutes = () => {
 						</PageWrapper>
 					}
 				/>
+
 				<Route
 					path='/company/new'
 					element={

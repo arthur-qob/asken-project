@@ -5,15 +5,18 @@ import { BrowserRouter } from 'react-router-dom'
 import App from './app'
 import { UserProvider } from './contexts/userContext'
 import { LoadingProvider } from './contexts/loadingContext'
+import { ModalProvider } from './contexts/modalContext'
 
 createRoot(document.getElementById('root')!).render(
 	<StrictMode>
-		<LoadingProvider>
-			<UserProvider>
-				<BrowserRouter>
-					<App />
-				</BrowserRouter>
-			</UserProvider>
-		</LoadingProvider>
+		<ModalProvider>
+			<LoadingProvider>
+				<UserProvider>
+					<BrowserRouter>
+						<App />
+					</BrowserRouter>
+				</UserProvider>
+			</LoadingProvider>
+		</ModalProvider>
 	</StrictMode>
 )

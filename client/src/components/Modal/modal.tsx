@@ -3,14 +3,14 @@ import styles from './styles.module.scss'
 type ModalProps = {
 	children: React.ReactNode
 	isOpen: boolean
-	onClose?: () => void | undefined
+	onClose?: (param: any) => any
 }
 
 const Modal: React.FC<ModalProps> = ({ children, isOpen, onClose }) => {
 	if (!isOpen) return null
 
 	return (
-		<section
+		<div
 			className={styles.modalBackground}
 			onClick={onClose}>
 			<div className={styles.modal}>
@@ -23,7 +23,7 @@ const Modal: React.FC<ModalProps> = ({ children, isOpen, onClose }) => {
 				)}
 				{children}
 			</div>
-		</section>
+		</div>
 	)
 }
 
