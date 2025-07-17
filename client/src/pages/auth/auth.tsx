@@ -16,23 +16,34 @@ const Auth = () => {
 	>(null)
 	const prevRouteRef = useRef(currentRoute)
 
+	const [img, setImg] = useState<'/img_plane.png' | '/img_ship.png'>(
+		'/img_ship.png'
+	)
+
+	const [imgAnimation, setImgAnimation] = useState<string>('')
+
 	useEffect(() => {
 		const prevRoute = prevRouteRef.current
 
 		if (prevRoute !== currentRoute) {
-			// If moving from signin to signup, animate left
 			if (prevRoute === '/signin' && currentRoute === '/signup') {
 				setAnimateDirection('left')
-			}
-			// If moving from signup to signin, animate right
-			else if (prevRoute === '/signup' && currentRoute === '/signin') {
+				setImg('/img_plane.png')
+				setImgAnimation(styles.animateOpacity)
+			} else if (prevRoute === '/signup' && currentRoute === '/signin') {
 				setAnimateDirection('right')
+				setImg('/img_ship.png')
+				setImgAnimation(styles.animateOpacity)
 			} else {
 				setAnimateDirection(null)
 			}
 		}
 
 		prevRouteRef.current = currentRoute
+
+		setTimeout(() => {
+			setImgAnimation('')
+		}, 800)
 	}, [currentRoute])
 
 	return (
@@ -69,7 +80,11 @@ const Auth = () => {
 							? styles.animateLeftToRight
 							: ''
 					}`}>
-					<h1>IMG HERE</h1>
+					{/* <h1>IMG HERE</h1> */}
+					<img
+						className={`${styles.authImg} ${imgAnimation}`}
+						src={img}
+					/>
 				</section>
 			</div>
 		</PageWrapper>
